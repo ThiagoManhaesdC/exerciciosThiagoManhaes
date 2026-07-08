@@ -1,7 +1,7 @@
 interface Tarefa {
     id: number;
     titulo: string;
-    descricao: string;
+    descricao?: string;
     concluida: boolean;
 }
 
@@ -38,6 +38,7 @@ function removerTarefa(id: number) {
     if (index !== -1) {
         listaDeTarefas.splice(index, 1);
     }
+    return true;
 }
 
 export { listarTarefas, buscarTarefa, adicionarTarefa, atualizarTarefa, removerTarefa };
