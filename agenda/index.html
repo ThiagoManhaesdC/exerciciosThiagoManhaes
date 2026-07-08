@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda Minimalista</title>
+    <!-- Fonte moderna e limpa -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --primary: #3b82f6;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--card);
+            width: 100%;
+            max-width: 400px;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 24px;
+            color: var(--primary);
+        }
+
+        input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 15px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+        }
+
+        button {
+            width: 100%;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 24px;
+        }
+
+        button:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .contato-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .info strong {
+            display: block;
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .info span {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .btn-editar {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            width: auto;
+            margin: 0;
+        }
+
+        .btn-editar:hover {
+            background: var(--primary);
+            color: white;
+            transform: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Agenda Contatos</h1>
+
+        <input type="text" id="inputNome" placeholder="Nome do Contato" autocomplete="off">
+        <input type="text" id="inputTelefone" placeholder="Telefone" autocomplete="off">
+        <button id="btnSalvar" onclick="salvar()">Adicionar Contato</button>
+
+        <div id="listaContatos"></div>
+    </div>
+
+    <script>
+        const URL_API = 'http://localhost:7000';
+        let editando = false;
+
+        async function carregarAgenda() {
+            try {
+                const resposta = await fetch(`${URL_API}/agenda`);
+                const contatos = await resposta.json();
+
+                const divLista = document.getElementById('listaContatos');
+                divLista.innerHTML = '';
+
+                contatos.forEach(contato => {
+                    divLista.innerHTML += `
+                    <div class="contato-item">
+                        <div class="info">
+                            <strong>${contato.nome}</strong>
+                            <span>${contato.telefone}</span>
+                        </div>
+                        <button class="btn-editar" onclick="prepararEdicao('${contato.nome}', '${contato.telefone}')">Editar</button>
+                    </div>
+                `;
+                });
+            } catch (erro) {
+                console.error("Erro ao carregar a agenda. O servidor está rodando?", erro);
+            }
+        }
+
+        function prepararEdicao(nome, telefone) {
+            document.getElementById('inputNome').value = nome;
+            document.getElementById('inputNome').disabled = true; // Bloqueia edição do nome
+            document.getElementById('inputTelefone').value = telefone;
+            document.getElementById('inputTelefone').focus();
+
+            document.getElementById('btnSalvar').innerText = 'Atualizar Contato';
+            editando = true;
+        }
+
+        async function salvar() {
+            const nome = document.getElementById('inputNome').value;
+            const telefone = document.getElementById('inputTelefone').value;
+
+            if (!nome || !telefone) return alert("Preencha os dois campos!");
+
+            try {
+                if (editando) {
+                    // Envia como PUT usando texto simples para evitar erro de CORS 'OPTIONS'
+                    await fetch(`${URL_API}/contato/${nome}`, {
+                        method: 'PUT',
+                        body: JSON.stringify({ telefone })
+                    });
+
+                    editando = false;
+                    document.getElementById('inputNome').disabled = false;
+                    document.getElementById('btnSalvar').innerText = 'Adicionar Contato';
+                } else {
+                    await fetch(`${URL_API}/contato`, {
+                        method: 'POST',
+                        body: JSON.stringify({ nome, telefone })
+                    });
+                }
+
+                // Limpa os campos e recarrega a lista
+                document.getElementById('inputNome').value = '';
+                document.getElementById('inputTelefone').value = '';
+                carregarAgenda();
+
+            } catch (erro) {
+                alert("Falha de conexão com o servidor. Verifique se o Node está rodando!");
+            }
+        }
+
+        // Chama ao abrir a página
+        carregarAgenda();
+    </script>
+
+</body>
+
+</html>
