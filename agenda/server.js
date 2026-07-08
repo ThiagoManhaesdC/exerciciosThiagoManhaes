@@ -5,25 +5,16 @@ const PORTA = 7000;
 const agenda = new Agenda();
 
 const servidor = http.createServer((requisicao, resposta) => {
-    // Permissão CORS para qualquer frontend (como o nosso HTML rodando local) fazer requisições
-    resposta.setHeader("Access-Control-Allow-Origin", "*");
-    resposta.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS");
-
-    // Lida com a requisição de segurança inicial dos navegadores (Preflight)
-    if (requisicao.method === "OPTIONS") {
-        resposta.writeHead(204);
-        return resposta.end();
-    }
-
     const metodo = requisicao.method;
     const caminho = requisicao.url;
 
-    // Extraímos o possível nome dividindo a URL pelas barras
+    // Extrai o possível nome dividindo a URL pelas barras
     // Exemplo: se o caminho for "/contato/Joao", o nomeExtraido será "Joao"
     const nomeExtraido = caminho.split("/")[2];
 
     // Listar todos os contatos
     if (metodo === "GET" && caminho === "/agenda") {
+        res.writerHead(200);
         const listaDeContatos = agenda.listar();
         const listaEmFormatoDeTexto = JSON.stringify(listaDeContatos);
 
