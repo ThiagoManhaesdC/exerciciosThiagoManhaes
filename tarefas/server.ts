@@ -1,7 +1,7 @@
 import express, { type Request, type Response } from "express";
-import { listarTarefas, buscarTarefa, adicionarTarefa, atualizarTarefa, removerTarefa } from "./tarefas";
+import { listarTarefas, buscarTarefa, adicionarTarefa, atualizarTarefa, removerTarefa } from "./tarefas.ts";
 
-const PORTA = 7000;
+const PORTA = 9002;
 
 const app = express();
 
@@ -33,7 +33,7 @@ app.put('/api/tarefas/:id', (req: Request, res: Response) => {
 });
 
 app.delete('/api/tarefas/:id', (req: Request, res: Response) => {
-    removerTarefa(Number(req.params.id));
+    const removido = removerTarefa(Number(req.params.id));
     if (removido) {
         res.status(204).send();
     } else {
@@ -44,4 +44,4 @@ app.delete('/api/tarefas/:id', (req: Request, res: Response) => {
 // Iniciando o servidor na porta definida
 app.listen(PORTA, () => {
     console.log(`🚀 Servidor rodando em http://localhost:${PORTA}`);
-})
+});
