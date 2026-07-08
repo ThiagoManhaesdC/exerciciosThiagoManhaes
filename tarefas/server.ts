@@ -34,7 +34,11 @@ app.put('/api/tarefas/:id', (req: Request, res: Response) => {
 
 app.delete('/api/tarefas/:id', (req: Request, res: Response) => {
     removerTarefa(Number(req.params.id));
-    res.status(204).send();
+    if (removido) {
+        res.status(204).send();
+    } else {
+        res.status(404).json({ error: 'Tarefa não encontrada!' });
+    }
 });
 
 // Iniciando o servidor na porta definida
