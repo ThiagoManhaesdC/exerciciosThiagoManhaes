@@ -1,0 +1,29 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+}
+
+header {
+    text-align: center;
+}
+
+h1 {
+    color: #00008b; /* Azul escuro */
+}
+
+.subtitulo {
+    font-style: italic;
+    color: #555555; /* Cinza escuro */
+}
+
+.card-perfil {
+    background-color: white;
+    padding: 20px;
+    border: 1px solid lightgray;
+    border-radius: 8px; /* Arredondamento adequado */
+}
+
+#habilidade-foco {
+    font-weight: bold;
+    color: green; /* Verde conforme instrução */
+}
